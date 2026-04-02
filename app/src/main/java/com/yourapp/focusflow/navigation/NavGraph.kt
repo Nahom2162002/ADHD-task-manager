@@ -1,0 +1,19 @@
+package com.yourapp.focusflow.navigation
+
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import com.yourapp.focusflow.feature_focus.presentation.FocusScreen
+import com.yourapp.focusflow.feature_task.presentation.TaskScreen
+
+@Composable
+fun FocusFlowNavGraph(navController: NavHostController) {
+    NavHost(
+        navController = navController,
+        startDestination = Routes.Tasks,
+    ) {
+        composable(Routes.Tasks) { TaskScreen() }
+        composable(Routes.Focus) { FocusScreen() }
+    }
+}

@@ -1,0 +1,219 @@
+📦 APP LAYER
+MainActivity.kt
+Entry point of your app
+Sets up Jetpack Compose UI
+Hosts navigation
+---
+Navigation.kt / NavGraph.kt
+Defines app screens and routes
+Handles navigation between:
+Task screen
+Focus screen
+Schedule screen
+---
+App.kt
+Initializes dependency injection (Hilt)
+Sets up global configs
+---
+🧩 CORE LAYER (Shared Across Features)
+core/ui/components/
+
+Reusable UI pieces:
+Buttons
+Task cards
+Timers
+---
+core/util/
+Result.kt
+Wraps success/error states
+---
+TimeUtils.kt
+Time calculations:
+Duration
+Formatting timers
+Break intervals
+Constants.kt
+App-wide constants:
+Break durations
+Task limits
+---
+core/data/
+local/
+Shared Room database setup
+
+remote/
+Firebase / API logic
+---
+🔥 core/system/ (VERY IMPORTANT)
+
+This is your secret weapon layer.
+
+AppBlocker.kt
+Wraps Accessibility Service
+Detects and blocks distracting apps
+---
+UsageTracker.kt
+Uses UsageStatsManager
+Tracks which apps user opens
+---
+FocusModeManager.kt
+Central controller for focus sessions
+
+Handles:
+
+Start/stop focus mode
+Enable blocking
+Trigger workers
+---
+NotificationHelper.kt
+Sends notifications:
+Break reminders
+Encouragement
+Alerts
+---
+📦 FEATURE: TASK
+TaskEntity.kt
+Database model (Room)
+---
+TaskDao.kt
+Database queries
+---
+Task.kt (domain model)
+Clean version of data used in app
+---
+TaskRepository.kt
+Interface (contract)
+---
+TaskRepositoryImpl.kt
+Implements the interface
+Connects Room → domain
+---
+🧠 Use Cases
+AddTaskUseCase.kt
+Handles logic for adding task
+---
+CompleteTaskUseCase.kt
+Marks task complete
+Removes from DB
+Triggers:
+Achievement
+Affirmation
+---
+GetTasksUseCase.kt
+Fetches tasks for UI
+---
+🎯 Presentation
+TaskViewModel.kt
+Holds UI state
+
+Handles:
+
+User actions
+Calls use cases
+---
+TaskScreen.kt
+UI built with Compose
+Displays:
+Task list
+Add task form
+---
+🎯 FEATURE: FOCUS
+FocusRepository.kt
+Defines focus operations
+---
+FocusRepositoryImpl.kt
+Connects to:
+FocusModeManager
+Workers
+---
+🧠 Use Cases
+StartFocusSession.kt
+Starts:
+Timer
+App blocking
+Background worker
+---
+EndFocusSession.kt
+Stops everything
+---
+BlockAppsUseCase.kt
+Sends blocked apps list to system layer
+---
+🎯 Presentation
+FocusViewModel.kt
+Tracks:
+Timer
+Focus state
+Distractions
+---
+FocusScreen.kt
+UI:
+Timer
+“Start Focus” button
+---
+📅 FEATURE: SCHEDULE
+GenerateSchedule.kt
+Smart scheduling logic
+
+*Future: AI-based prioritization
+---
+ValidateSchedule.kt
+Enforces rules:
+No last-minute high urgency tasks
+---
+☕ FEATURE: BREAK
+CalculateBreakTiming.kt
+Determines:
+Midpoint (Medium)
+Quarter intervals (High)
+---
+TriggerBreak.kt
+Fires notification
+Pauses focus session
+---
+💬 FEATURE: AFFIRMATION
+GenerateAffirmation.kt
+Returns encouraging messages
+
+*Later: Use OpenAI for dynamic text
+---
+🏆 FEATURE: ACHIEVEMENT
+TrackProgress.kt
+Tracks completed tasks
+---
+UnlockAchievement.kt
+Triggers:
+UI popup
+Rewards
+---
+⚙️ BACKGROUND WORKERS
+
+Using WorkManager
+
+FocusWorker.kt
+Runs during focus session
+Tracks time
+Ends session automatically
+---
+BreakWorker.kt
+Triggers breaks at correct time
+---
+ReminderWorker.kt
+Nudges user if inactive
+---
+🔌 DEPENDENCY INJECTION
+AppModule.kt
+Provides app-wide dependencies
+---
+DatabaseModule.kt
+Provides Room DB
+---
+RepositoryModule.kt
+Connects interfaces → implementations
+---
+🧭 NAVIGATION
+Routes.kt
+Defines route constants
+---
+NavGraph.kt
+Connects routes → screens
