@@ -15,5 +15,6 @@ fun FocusFlowNavGraph(navController: NavHostController) {
     ) {
         composable(Routes.Tasks) { TaskScreen() }
         composable(Routes.Focus) { FocusScreen() }
+        composable(Routes.Schedule) { ScheduleScreen() }
     }
 }
