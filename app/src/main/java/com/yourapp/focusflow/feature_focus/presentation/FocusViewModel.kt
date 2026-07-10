@@ -2,6 +2,8 @@ package com.yourapp.focusflow.feature_focus.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.yourapp.focusflow.core.system.AppInfo
+import com.yourapp.focusflow.core.system.GetInstalledAppsUseCase
 import com.yourapp.focusflow.core.util.Constants
 import com.yourapp.focusflow.core.util.TimeUtils
 import com.yourapp.focusflow.feature_focus.domain.repository.FocusRepository
@@ -20,7 +22,8 @@ import javax.inject.Inject
 class FocusViewModel @Inject constructor(
     private val repository: FocusRepository,
     private val startFocusSessionUseCase: StartFocusSession,
-    private val endFocusSessionUseCase: EndFocusSession
+    private val endFocusSessionUseCase: EndFocusSession,
+    private val getInstalledAppsUseCase: GetInstalledAppsUseCase
 ) : ViewModel() {
 
     val isFocusActive = repository.isFocusActive
@@ -31,9 +34,35 @@ class FocusViewModel @Inject constructor(
     private val _progress = MutableStateFlow(1f)
     val progress: StateFlow<Float> = _progress.asStateFlow()
 
+    private val _installedApps = MutableStateFlow<List<AppInfo>>(emptyList())
+    val installedApps: StateFlow<List<AppInfo>> = _installedApps.asStateFlow()
+
+    private val _selectedApps = MutableStateFlow<Set<String>>(emptySet())
+    val selectedApps: StateFlow<Set<String>> = _selectedApps.asStateFlow()
+
     private var timerJob: Job? = null
     private var totalSeconds = Constants.DEFAULT_FOCUS_DURATION_MINS * 60L
     private var secondsRemaining = totalSeconds
+
+    init {
+        loadInstalledApps()
+    }
+
+    private fun loadInstalledApps() {
+        viewModelScope.launch {
+            _installedApps.value = getInstalledAppsUseCase()
+        }
+    }
+
+    fun onAppSelectionToggle(packageName: String) {
+        val current = _selectedApps.value.toMutableSet()
+        if (current.contains(packageName)) {
+            current.remove(packageName)
+        } else {
+            current.add(packageName)
+        }
+        _selectedApps.value = current
+    }
 
     fun toggleFocus() {
         viewModelScope.launch {
@@ -46,8 +75,7 @@ class FocusViewModel @Inject constructor(
     }
 
     private suspend fun startFocus() {
-        // In a real app, we'd get blocked apps from user settings
-        startFocusSessionUseCase(Constants.DEFAULT_FOCUS_DURATION_MINS, emptySet())
+        startFocusSessionUseCase(Constants.DEFAULT_FOCUS_DURATION_MINS, _selectedApps.value)
         startTimer()
     }
 
@@ -65,7 +93,7 @@ class FocusViewModel @Inject constructor(
                 secondsRemaining--
                 updateTimerUi()
             }
-            stopFocus() // Auto-stop when finished
+            stopFocus()
         }
     }
 
