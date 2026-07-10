@@ -7,5 +7,8 @@ import androidx.room.PrimaryKey
 data class TaskEntity(
     @PrimaryKey val id: String,
     val title: String,
-    val isCompleted: Boolean,
+    val description: String = "",
+    val isCompleted: Boolean = false,
+    val priority: Int = 1, // 1: Low, 2: Medium, 3: High
+    val createdAt: Long = System.currentTimeMillis()
 )
