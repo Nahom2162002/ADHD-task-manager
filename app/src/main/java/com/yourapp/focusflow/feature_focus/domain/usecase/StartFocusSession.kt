@@ -6,7 +6,7 @@ import javax.inject.Inject
 class StartFocusSession @Inject constructor(
     private val repository: FocusRepository,
 ) {
-    suspend operator fun invoke() {
-        repository.startSession()
+    suspend operator fun invoke(durationMins: Int, blockedApps: Set<String>) {
+        repository.startSession(durationMins, blockedApps)
     }
 }
