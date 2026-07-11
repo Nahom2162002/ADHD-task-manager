@@ -1,5 +1,7 @@
 package com.yourapp.focusflow.core.util
 
+import com.yourapp.focusflow.BuildConfig
+
 /**
  * App-wide constants for FocusFlow.
  * Centralizing these values makes it easier to tune the ADHD-specific logic 
@@ -27,5 +29,7 @@ object Constants {
     const val FOCUS_NOTIFICATION_ID = 1001
     const val BREAK_NOTIFICATION_ID = 1002
 
-    const val GEMINI_API_KEY = "AQ.Ab8RN6JuJKwKs_EOWhNRYdAq8kfjzOeycu_3SaP9j4LyagzVRg"
+    // API Keys should NEVER be hardcoded.
+    // This value is now pulled from BuildConfig, which is populated via local.properties.
+    val GEMINI_API_KEY = BuildConfig.GEMINI_API_KEY
 }
