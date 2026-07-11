@@ -6,6 +6,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import androidx.core.app.NotificationCompat
+import androidx.privacysandbox.tools.core.generator.build
 import com.yourapp.focusflow.core.system.NotificationHelper
 import com.yourapp.focusflow.core.util.Constants
 import dagger.assisted.Assisted
@@ -36,6 +37,17 @@ class BreakWorker @AssistedInject constructor(
         )
 
         return Result.success()
+    override suspend fun doWork(): com.google.android.gms.common.api.Result {
+        val durationMins = inputData.getInt("BREAK_DURATION", 5)
+
+        // Show a persistent notification during the break
+        setForeground(createForegroundInfo(durationMins))
+
+        delay(TimeUnit.MINUTES.toMillis(durationMins.toLong()))
+
+        notificationHelper.showReminder("Break Over!", "Ready to dive back in?")
+
+        return com.google.android.gms.common.api.Result.success()
     }
 
     private fun createForegroundInfo(duration: Int): ForegroundInfo {
@@ -46,6 +58,9 @@ class BreakWorker @AssistedInject constructor(
             .setOngoing(true)
             .build()
 
+        return ForegroundInfo(Constants.BREAK_NOTIFICATION_ID, notification)
+    }
+}
         return ForegroundInfo(Constants.BREAK_NOTIFICATION_ID, notification)
     }
 }
