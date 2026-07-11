@@ -5,6 +5,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -16,7 +18,9 @@ import kotlinx.coroutines.flow.collectLatest
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskScreen(
-    viewModel: TaskViewModel = hiltViewModel()
+    viewModel: TaskViewModel = hiltViewModel(),
+    onNavigateToAchievements: () -> Unit,
+    onNavigateToFocus: () -> Unit
 ) {
     val tasks by viewModel.tasks.collectAsState()
     val newTaskTitle by viewModel.newTaskTitle.collectAsState()
@@ -26,8 +30,12 @@ fun TaskScreen(
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
                 is TaskViewModel.UiEvent.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(message = event.message)
+                }
+                is TaskViewModel.UiEvent.ShowAchievement -> {
                     snackbarHostState.showSnackbar(
-                        message = event.message
+                        message = "Achievement Unlocked: ${event.message}",
+                        actionLabel = "View"
                     )
                 }
             }
@@ -37,7 +45,17 @@ fun TaskScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            TopAppBar(title = { Text("FocusFlow Tasks") })
+            TopAppBar(
+                title = { Text("FocusFlow Tasks") },
+                actions = {
+                    IconButton(onClick = onNavigateToFocus) {
+                        Icon(Icons.Default.PlayArrow, contentDescription = "Focus Mode")
+                    }
+                    IconButton(onClick = onNavigateToAchievements) {
+                        Icon(Icons.Default.Star, contentDescription = "Achievements")
+                    }
+                }
+            )
         }
     ) { padding ->
         Column(

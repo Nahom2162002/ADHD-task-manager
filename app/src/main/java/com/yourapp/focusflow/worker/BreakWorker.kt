@@ -1,14 +1,51 @@
 package com.yourapp.focusflow.worker
 
 import android.content.Context
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
-import androidx.work.ListenableWorker
+import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
+import androidx.core.app.NotificationCompat
+import com.yourapp.focusflow.core.system.NotificationHelper
+import com.yourapp.focusflow.core.util.Constants
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
+import kotlinx.coroutines.delay
+import java.util.concurrent.TimeUnit
 
-class BreakWorker(
-    context: Context,
-    params: WorkerParameters,
+@HiltWorker
+class BreakWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
+    private val notificationHelper: NotificationHelper
 ) : CoroutineWorker(context, params) {
-    override suspend fun doWork(): ListenableWorker.Result =
-        ListenableWorker.Result.success()
+
+    override suspend fun doWork(): Result {
+        val durationMins = inputData.getInt("BREAK_DURATION_MINS", 5)
+        val durationMillis = TimeUnit.MINUTES.toMillis(durationMins.toLong())
+        
+        // Show a foreground notification for the break to prevent system kill
+        setForeground(createForegroundInfo(durationMins))
+
+        delay(durationMillis)
+
+        // When break is over, nudge them back to focus
+        notificationHelper.showReminder(
+            "Break Over! ☕", 
+            "Time to get back into the flow. Ready to start your next session?"
+        )
+
+        return Result.success()
+    }
+
+    private fun createForegroundInfo(duration: Int): ForegroundInfo {
+        val notification = NotificationCompat.Builder(applicationContext, Constants.BREAK_NOTIFICATION_CHANNEL_ID)
+            .setContentTitle("Relaxing Break")
+            .setContentText("$duration minutes to recharge.")
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setOngoing(true)
+            .build()
+
+        return ForegroundInfo(Constants.BREAK_NOTIFICATION_ID, notification)
+    }
 }

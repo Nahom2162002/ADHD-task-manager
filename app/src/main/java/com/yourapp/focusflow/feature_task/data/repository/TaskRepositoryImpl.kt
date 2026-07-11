@@ -32,6 +32,10 @@ class TaskRepositoryImpl @Inject constructor(
         taskDao.deleteTask(task.toTaskEntity())
     }
 
+    override suspend fun getCompletedTasksCount(): Int {
+        return taskDao.getCompletedTasksCount()
+    }
+
     private fun TaskEntity.toTask(): Task {
         return Task(
             id = id,
