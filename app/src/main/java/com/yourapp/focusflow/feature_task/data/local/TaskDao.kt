@@ -20,4 +20,7 @@ interface TaskDao {
 
     @Delete
     suspend fun deleteTask(task: TaskEntity)
+
+    @Query("SELECT COUNT(*) FROM tasks WHERE isCompleted = 1")
+    suspend fun getCompletedTasksCount(): Int
 }
