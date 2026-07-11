@@ -8,4 +8,5 @@ interface TaskRepository {
     suspend fun getTaskById(id: String): Task?
     suspend fun insertTask(task: Task)
     suspend fun deleteTask(task: Task)
+    suspend fun getCompletedTasksCount(): Int
 }
