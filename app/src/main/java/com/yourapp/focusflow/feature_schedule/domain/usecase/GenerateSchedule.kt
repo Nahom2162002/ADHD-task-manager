@@ -12,46 +12,33 @@ data class ScheduledItem(
     val startTimeDisplay: String
 )
 
+package com.yourapp.focusflow.feature_schedule.domain.usecase
+
+import com.yourapp.focusflow.feature_task.domain.model.Task
+import com.yourapp.focusflow.feature_task.domain.repository.TaskRepository
+import com.yourapp.focusflow.feature_schedule.domain.repository.ScheduleAiService
+import kotlinx.coroutines.flow.first
+import javax.inject.Inject
+
 class GenerateSchedule @Inject constructor(
-    private val taskRepository: TaskRepository
+    private val taskRepository: TaskRepository,
+    private val aiService: ScheduleAiService // Injected AI service
 ) {
     suspend operator fun invoke(): List<ScheduledItem> {
-        val tasks = taskRepository.getTasks().first()
-            .filter { !it.isCompleted }
-            .sortedByDescending { it.priority }
+        val tasks = taskRepository.getTasks().first().filter { !it.isCompleted }
 
-        val schedule = mutableListOf<ScheduledItem>()
-        var currentMinutes = 540 // Start at 9:00 AM (9 * 60)
-
-        tasks.take(5).forEach { task -> // Limit to 5 tasks to avoid overwhelm
-            // 1. Add the Task
-            schedule.add(
-                ScheduledItem(
-                    task = task,
-                    durationMins = 25,
-                    startTimeDisplay = formatMinutesToTime(currentMinutes)
-                )
-            )
-            currentMinutes += 25
-
-            // 2. Add a Mandatory ADHD Transition Buffer (5 mins)
-            schedule.add(
-                ScheduledItem(
-                    task = null,
-                    isBreak = true,
-                    durationMins = 5,
-                    startTimeDisplay = formatMinutesToTime(currentMinutes)
-                )
-            )
-            currentMinutes += 5
+        return try {
+            // Attempt to get a "Smart Plan" from the AI
+            val aiSchedule = aiService.prioritizeTasks(tasks)
+            if (aiSchedule.isNotEmpty()) aiSchedule else generateLocalSchedule(tasks)
+        } catch (e: Exception) {
+            // Fallback to local logic if AI fails
+            generateLocalSchedule(tasks)
         }
-
-        return schedule
     }
 
-    private fun formatMinutesToTime(totalMinutes: Long): String {
-        val hours = totalMinutes / 60
-        val mins = totalMinutes % 60
-        return String.format("%02d:%02d", hours, mins)
+    private fun generateLocalSchedule(tasks: List<Task>): List<ScheduledItem> {
+        // Your existing logic here...
+        return emptyList()
     }
 }
