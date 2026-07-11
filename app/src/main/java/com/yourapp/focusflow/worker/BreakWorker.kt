@@ -21,6 +21,22 @@ class BreakWorker @AssistedInject constructor(
     private val notificationHelper: NotificationHelper
 ) : CoroutineWorker(context, params) {
 
+    override suspend fun doWork(): Result {
+        val durationMins = inputData.getInt("BREAK_DURATION_MINS", 5)
+        val durationMillis = TimeUnit.MINUTES.toMillis(durationMins.toLong())
+        
+        // Show a foreground notification for the break to prevent system kill
+        setForeground(createForegroundInfo(durationMins))
+
+        delay(durationMillis)
+
+        // When break is over, nudge them back to focus
+        notificationHelper.showReminder(
+            "Break Over! ☕", 
+            "Time to get back into the flow. Ready to start your next session?"
+        )
+
+        return Result.success()
     override suspend fun doWork(): com.google.android.gms.common.api.Result {
         val durationMins = inputData.getInt("BREAK_DURATION", 5)
 
@@ -41,6 +57,10 @@ class BreakWorker @AssistedInject constructor(
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setOngoing(true)
             .build()
+
+        return ForegroundInfo(Constants.BREAK_NOTIFICATION_ID, notification)
+    }
+}
         return ForegroundInfo(Constants.BREAK_NOTIFICATION_ID, notification)
     }
 }

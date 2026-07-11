@@ -15,8 +15,17 @@ fun FocusFlowNavGraph(navController: NavHostController) {
         navController = navController,
         startDestination = Routes.Tasks,
     ) {
-        composable(Routes.Tasks) { TaskScreen() }
-        composable(Routes.Focus) { FocusScreen() }
+        composable(Routes.Tasks) { 
+            TaskScreen(
+                onNavigateToAchievements = { navController.navigate(Routes.Achievements) },
+                onNavigateToFocus = { navController.navigate(Routes.Focus) }
+            ) 
+        }
+        composable(Routes.Focus) { 
+            FocusScreen(
+                onNavigateToAchievements = { navController.navigate(Routes.Achievements) }
+            ) 
+        }
         composable(Routes.Schedule) { ScheduleScreen() }
         composable(Routes.Achievements) { AchievementScreen() }
     }

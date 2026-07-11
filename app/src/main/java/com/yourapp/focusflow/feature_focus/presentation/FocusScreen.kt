@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,7 +18,8 @@ import com.yourapp.focusflow.core.ui.components.PrimaryButton
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FocusScreen(
-    viewModel: FocusViewModel = hiltViewModel()
+    viewModel: FocusViewModel = hiltViewModel(),
+    onNavigateToAchievements: () -> Unit
 ) {
     val isFocusActive by viewModel.isFocusActive.collectAsState()
     val timerDisplay by viewModel.timerDisplay.collectAsState()
@@ -32,6 +34,9 @@ fun FocusScreen(
             TopAppBar(
                 title = { Text("Focus Session") },
                 actions = {
+                    IconButton(onClick = onNavigateToAchievements) {
+                        Icon(Icons.Default.Star, contentDescription = "Achievements")
+                    }
                     if (!isFocusActive) {
                         IconButton(onClick = { showAppSelection = true }) {
                             Icon(Icons.Default.Settings, contentDescription = "Select Apps to Block")

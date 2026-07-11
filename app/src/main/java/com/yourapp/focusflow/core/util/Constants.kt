@@ -26,4 +26,6 @@ object Constants {
     const val BREAK_NOTIFICATION_CHANNEL_ID = "break_channel"
     const val FOCUS_NOTIFICATION_ID = 1001
     const val BREAK_NOTIFICATION_ID = 1002
+
+    const val GEMINI_API_KEY = BuildConfig.GEMINI_API_KEY
 }
