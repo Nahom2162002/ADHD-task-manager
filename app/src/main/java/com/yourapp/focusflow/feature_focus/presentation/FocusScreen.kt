@@ -14,6 +14,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.yourapp.focusflow.core.ui.components.CircularTimer
 import com.yourapp.focusflow.core.ui.components.PrimaryButton
+import android.content.Intent
+import android.provider.Settings
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,6 +29,8 @@ fun FocusScreen(
     val progress by viewModel.progress.collectAsState()
     val installedApps by viewModel.installedApps.collectAsState()
     val selectedApps by viewModel.selectedApps.collectAsState()
+
+    val context = LocalContext.current
     
     var showAppSelection by remember { mutableStateOf(false) }
 
@@ -68,6 +73,21 @@ fun FocusScreen(
                 onClick = { viewModel.toggleFocus() },
                 modifier = Modifier.fillMaxWidth(0.7f)
             )
+
+            if (!isFocusActive) {
+                androidx.compose.foundation.layout.Row(horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)) {
+                    androidx.compose.material3.TextButton(onClick = {
+                        context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                    }) {
+                        androidx.compose.material3.Text("Grant Accessibility")
+                    }
+                    androidx.compose.material3.TextButton(onClick = {
+                        context.startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
+                    }) {
+                        androidx.compose.material3.Text("Grant Usage Stats")
+                    }
+                }
+            }
 
             if (isFocusActive) {
                 Text(

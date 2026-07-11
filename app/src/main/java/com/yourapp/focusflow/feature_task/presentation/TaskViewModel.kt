@@ -50,22 +50,33 @@ class TaskViewModel @Inject constructor(
                     id = UUID.randomUUID().toString(),
                     title = title
                 )
-                addTaskUseCase(newTask)
-                _newTaskTitle.value = ""
+                when (val result = addTaskUseCase(newTask)) {
+                    is AddTaskUseCase.Result.Success -> {
+                        _newTaskTitle.value = ""
+                    }
+                    is AddTaskUseCase.Result.Error -> {
+                        _eventFlow.emit(UiEvent.ShowSnackbar(result.message))
+                    }
+                }
             }
         }
     }
 
     fun onToggleTaskCompletion(task: Task) {
         viewModelScope.launch {
-            val affirmation = completeTaskUseCase(task.id)
-            if (affirmation != null) {
-                _eventFlow.emit(UiEvent.ShowSnackbar(affirmation))
+            val result = completeTaskUseCase(task.id)
+            if (result != null) {
+                if (result.unlockedAchievementId != null) {
+                    _eventFlow.emit(UiEvent.ShowAchievement(result.affirmation, result.unlockedAchievementId))
+                } else {
+                    _eventFlow.emit(UiEvent.ShowSnackbar(result.affirmation))
+                }
             }
         }
     }
 
     sealed class UiEvent {
         data class ShowSnackbar(val message: String): UiEvent()
+        data class ShowAchievement(val message: String, val achievementId: String): UiEvent()
     }
 }
