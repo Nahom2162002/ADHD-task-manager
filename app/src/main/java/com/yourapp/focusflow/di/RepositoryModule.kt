@@ -1,5 +1,7 @@
 package com.yourapp.focusflow.di
 
+import com.yourapp.focusflow.feature_achievement.data.repository.AchievementRepositoryImpl
+import com.yourapp.focusflow.feature_achievement.domain.repository.AchievementRepository
 import com.yourapp.focusflow.feature_focus.data.repository.FocusRepositoryImpl
 import com.yourapp.focusflow.feature_focus.domain.repository.FocusRepository
 import com.yourapp.focusflow.feature_task.data.repository.TaskRepositoryImpl
@@ -20,4 +22,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindFocusRepository(impl: FocusRepositoryImpl): FocusRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAchievementRepository(impl: AchievementRepositoryImpl): AchievementRepository
 }
