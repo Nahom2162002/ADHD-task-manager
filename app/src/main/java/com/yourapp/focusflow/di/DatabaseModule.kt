@@ -2,6 +2,7 @@ package com.yourapp.focusflow.di
 
 import android.content.Context
 import androidx.room.Room
+import com.yourapp.focusflow.feature_achievement.data.local.AchievementDao
 import com.yourapp.focusflow.feature_task.data.local.FocusFlowDatabase
 import com.yourapp.focusflow.feature_task.data.local.TaskDao
 import dagger.Module
@@ -23,8 +24,13 @@ object DatabaseModule {
             context,
             FocusFlowDatabase::class.java,
             "focus_flow.db",
-        ).build()
+        )
+        .fallbackToDestructiveMigration() // Added for development as we changed schema
+        .build()
 
     @Provides
     fun provideTaskDao(database: FocusFlowDatabase): TaskDao = database.taskDao()
+
+    @Provides
+    fun provideAchievementDao(database: FocusFlowDatabase): AchievementDao = database.achievementDao()
 }
